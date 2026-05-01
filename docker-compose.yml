@@ -1,0 +1,10 @@
+services:
+  ft_ping:
+    build: .
+    container_name: ft_ping_container
+    volumes:
+      - .:/app
+    cap_add:
+      - NET_RAW
+    stdin_open: true
+    tty: true
