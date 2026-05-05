@@ -7,13 +7,13 @@ endif
 NAME        = ft_ping
 
 CC          = cc
-CFLAGS      = -Wall -Wextra -Werror -g3
+CFLAGS      = -g3
 
 SRC_DIR     = src
 INC_DIR     = inc
 OBJ_DIR     = .obj
 
-SRCS_FILES  = main.c
+SRCS_FILES  = ping.c utils.c
 
 SRCS        = $(addprefix $(SRC_DIR)/, $(SRCS_FILES))
 OBJS        = $(addprefix $(OBJ_DIR)/, $(SRCS_FILES:.c=.o))
