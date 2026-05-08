@@ -13,18 +13,20 @@ SRC_DIR     = src
 INC_DIR     = inc
 OBJ_DIR     = .obj
 
-SRCS_FILES  = ping.c utils.c
+SRCS_FILES  = ping.c utils.c types.c signal.c
 
 SRCS        = $(addprefix $(SRC_DIR)/, $(SRCS_FILES))
 OBJS        = $(addprefix $(OBJ_DIR)/, $(SRCS_FILES:.c=.o))
 
 INCLUDES    = -I$(INC_DIR)
+LDLIBS      = -lm
 
 
 all: $(NAME)
 
+
 $(NAME): $(OBJS)
-	$(CC) $(CFLAGS) $(OBJS) -o $(NAME)
+	$(CC) $(CFLAGS) $(OBJS) -o $(NAME) $(LDLIBS)
 	@echo "\033[32m[✓] $(NAME) créé avec succès\033[0m"
 
 
