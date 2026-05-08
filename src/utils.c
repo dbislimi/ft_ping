@@ -19,7 +19,7 @@ void    build_icmp_packet(t_packet *pkt, int sequence_number){
     struct timespec ts;
     int packet_size = sizeof(*pkt);
     
-    if (sequence_number == 1){
+	if (sequence_number == 0){
         bzero(pkt, packet_size);
         pkt->hdr.type = ICMP_ECHO;
         pkt->hdr.code = 0;
@@ -114,7 +114,7 @@ void	update_stats(t_stats *s, double roundtrip){
 	++s->received;
 	if (roundtrip > s->max)
 		s->max = roundtrip;
-	else if (roundtrip < s->min)
+	if (roundtrip < s->min)
 		s->min = roundtrip;
 	s->sum += roundtrip;
 	s->sumsq += roundtrip * roundtrip;

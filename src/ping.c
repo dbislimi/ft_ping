@@ -55,9 +55,10 @@ void	start_loop(t_ping *p){
 				if (handle_response(p, &pkt, time) == 0)
 					continue;
 		}
-		double roundtrip = 1e3 - time;
-		update_stats(&stats, roundtrip);
-		usleep(roundtrip * 1e3);
+		update_stats(&stats, time);
+		double sleep = 1e6 - time * 1e3;
+		if (sleep > 0)
+			usleep(sleep);
 	}
 	display_stats(&stats, p->fqdn);
 }
