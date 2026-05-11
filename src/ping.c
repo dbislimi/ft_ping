@@ -63,11 +63,11 @@ void	start_loop(t_ping *p){
 	display_stats(&stats, p->fqdn);
 }
 
-void ping(char *ip_or_fqdn){
+void ping(char *ip_or_fqdn, t_config *conf){
 	t_ping ping_env;
 
     ping_env.sockfd = open_rawsocket();
-	init_penv(&ping_env, ip_or_fqdn);
+	init_penv(&ping_env, ip_or_fqdn, conf);
 	printf("PING %s (%s): %d data bytes\n",
 		ping_env.fqdn,
 		ping_env.ip,
@@ -76,12 +76,11 @@ void ping(char *ip_or_fqdn){
 }
 
 int main(int ac, char **av){
-    if (ac != 2){
-        fprintf(stderr, "Error: should have 1 argument.\n");
-        exit(1);
-    }
+	t_config	conf = {0};
 	struct sigaction sa;
-
+	
+	int arg = parse_args(ac, av, &conf);
+	
 	sa.sa_handler = sigint_handler;
 	sigemptyset(&sa.sa_mask);
 	sa.sa_flags = 0;
@@ -89,6 +88,6 @@ int main(int ac, char **av){
 		perror("Sigaction");
 		return 1;
 	}
-    ping(av[1]);
+    ping(av[arg], &conf);
 	return 0;
 }

@@ -17,6 +17,7 @@
 #include <poll.h>
 #include <signal.h>
 #include <math.h>
+#include <getopt.h>
 
 #define ICMP_PAYLOAD_SIZE 56
 
@@ -42,6 +43,15 @@ typedef struct s_ctx {
 
 typedef void (*t_icmp_handler)(t_packet *, t_ctx *);
 
+enum flags {
+	FLAG_VERBOSE = 1 << 0,
+	FLAG_HELP = 1 << 1
+};
+
+typedef struct s_config {
+	unsigned int	flags : 2;
+} t_config;
+
 typedef struct s_ping {
 	int		sockfd;
 	struct sockaddr_in sa;
@@ -50,6 +60,8 @@ typedef struct s_ping {
 	uint		sequence_number;
 	int		pid;
 	t_icmp_handler handlers[256];
+
+	t_config	*config;
 } t_ping;
 
 typedef struct s_stats {
@@ -68,7 +80,7 @@ void        build_icmp_packet(t_packet *pkt, int sequence_number);
 void		parse_packet(char *buf, t_ctx *ctx);
 int			is_it_for_us(t_ping *p, struct icmphdr *hdr);
 double		calcul_time(struct timespec t1, struct timespec t2);
-void	init_penv(t_ping *p, char *ip_or_fqdn);
+void	init_penv(t_ping *p, char *ip_or_fqdn, t_config *conf);
 
 void	handle_echo_reply(t_packet *pkt, t_ctx *ctx);
 void	handle_dest_unread(t_packet *pkt, t_ctx *ctx);
@@ -80,3 +92,6 @@ int open_rawsocket();
 void	init_stats(t_stats *s, int *sequence);
 void	update_stats(t_stats *s, double roundtrip);
 void	display_stats(t_stats *s, char *fqdn);
+
+void display_help();
+int	parse_args(int ac, char **av, t_config *conf);

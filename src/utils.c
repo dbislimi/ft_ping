@@ -34,7 +34,7 @@ void    build_icmp_packet(t_packet *pkt, int sequence_number){
 	
 }
 
-void	init_penv(t_ping *p, char *ip_or_fqdn){
+void	init_penv(t_ping *p, char *ip_or_fqdn, t_config *conf){
 	init_sockaddr(p, ip_or_fqdn);
 	p->pid = getpid();
 	for (int i = 0; i < 256; ++i){
@@ -43,6 +43,7 @@ void	init_penv(t_ping *p, char *ip_or_fqdn){
 	p->handlers[ICMP_ECHOREPLY] = handle_echo_reply;
 	p->handlers[ICMP_DEST_UNREACH] = handle_dest_unread;
 	p->handlers[ICMP_TIME_EXCEEDED] = handle_time_exceeded;
+	p->config = conf;
 }
 
 double	calcul_time(struct timespec t1, struct timespec t2){
@@ -140,4 +141,37 @@ void	display_stats(t_stats *s, char *fqdn){
 		avg,
 		s->max,
 		stddev);
+}
+
+void display_help(){
+	puts("Usage: ping [OPTION...] HOST ...\n"
+		"Send ICMP ECHO_REQUEST packets to network hosts.\n"
+		"\nOptions valid for all request types:\n\n"
+		"-v, --verbose              verbose output\n"
+		"\nOptions valid for --echo requests:\n\n"
+		"-?, --help                 give this help list\n"
+		"\nMandatory or optional arguments to long options are also mandatory or optional\nfor any corresponding short options.\n"
+		"\nOptions marked with (root only) are available only to superuser.\n"
+		"\nReport (unexistant) bugs to <dbislimi@student.42nice.fr>."
+		);
+}
+
+int	parse_args(int ac, char **av, t_config *conf){
+	const struct option long_opt[] = {
+		{"verbose", no_argument, NULL, FLAG_VERBOSE},
+		{"help", no_argument, NULL, FLAG_HELP},
+		{0, 0, 0, 0}
+	};
+	int opt;
+	while ((opt = getopt_long(ac, av, "v?", long_opt, NULL)) != -1)
+		conf->flags += opt;
+	if (conf->flags & 0b10){
+		display_help();
+		exit(0);
+	}
+	if (optind + 1 != ac){
+		fprintf(stderr, "Error: program should have only 1 argument.\n");
+		exit(1);
+	}
+	return optind;
 }
