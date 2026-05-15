@@ -45,11 +45,12 @@ typedef void (*t_icmp_handler)(t_packet *, t_ctx *);
 
 // enum flags {
 // 	FLAG_VERBOSE = 0b01,
-// 	FLAG_HELP = 0b10
+// 	FLAG_TTL = 0b10
 // };
 
 typedef struct s_config {
 	int	verbose;
+	int	ttl;
 } t_config;
 
 typedef struct s_ping {

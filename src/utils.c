@@ -31,7 +31,6 @@ void    build_icmp_packet(t_packet *pkt, int sequence_number){
     memcpy(pkt->msg, &ts, sizeof(ts));
     pkt->hdr.checksum = 0;
     pkt->hdr.checksum = calculate_checksum(pkt, packet_size);
-	
 }
 
 void	init_penv(t_ping *p, char *ip_or_fqdn, t_config *conf){
@@ -160,17 +159,33 @@ int	parse_args(int ac, char **av, t_config *conf){
 	const struct option long_opt[] = {
 		{"verbose", no_argument, 0, 'v'},
 		{"help", no_argument, 0, 'h'},
+		{"ttl", required_argument, 0, 't'},
 		{0, 0, 0, 0}
 	};
 	int opt;
 	opterr = 0;
-	while ((opt = getopt_long(ac, av, "v", long_opt, NULL)) != -1)
+	while ((opt = getopt_long(ac, av, ":v", long_opt, NULL)) != -1)
 	{
-		printf("optopt: %c\nopt: %c\n", optopt, opt);
+		// printf("optopt: %c\nopt: %c\n", optopt, opt);
 		switch (opt){
+			case ':':
+				puts("ping: option '--ttl' requires an argument");
+				break;
+			case 't':
+				char *endptr = NULL;
+				int ttl = strtol(optarg, &endptr, 10);
+
+				if (endptr == optarg || *endptr != '\0')
+					error(1, 0, "invalid value (`%s' near `%s')", optarg, endptr);
+				else if (ttl <= 0)
+					error(1, 0, "option value too small %s", optarg);
+				else if (ttl > 255)
+					error(1, 0, "option value too big %s", optarg);
+				conf->ttl = ttl;
+				continue;
 			case 'v':
 				conf->verbose = 1;
-				break;
+				continue;
 			case 'h':
 				display_help();
 				exit(0);
@@ -179,14 +194,12 @@ int	parse_args(int ac, char **av, t_config *conf){
 					display_help();
 					exit(0);
 				}
-				fprintf(stderr, "Try 'ping --help' for more information.\n");
-				exit(64);
 				break;
-		}
+			}
+			fprintf(stderr, "Try 'ping --help' for more information.\n");
+			exit(64);
 	}
-	if (optind + 1 != ac){
-		fprintf(stderr, "Error: program should have only 1 argument.\n");
-		exit(1);
-	}
+	if (optind == ac)
+		error(64, 0, "missing host operand");
 	return optind;
 }

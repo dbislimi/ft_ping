@@ -67,6 +67,10 @@ void ping(char *ip_or_fqdn, t_config *conf){
 	t_ping ping_env;
 
     ping_env.sockfd = open_rawsocket();
+	// if (conf->ttl > 0)
+	// 	if (setsockopt (ping_env.sockfd, IPPROTO_IP, IP_TTL,
+	// 			&conf->ttl, sizeof (conf->ttl)) < 0)
+	// 	error (0, errno, "setsockopt(IP_TTL)");
 	init_penv(&ping_env, ip_or_fqdn, conf);
 	printf("PING %s (%s): %zu data bytes",
 		ping_env.fqdn,
