@@ -1,6 +1,6 @@
 #include "../inc/ping.h"
 
-volatile sig_atomic_t g_is_running = 1;
+volatile sig_atomic_t FLAG_SIGINT = 1;
 
 int handle_response(t_ping *p, t_packet *pkt, double time){
 	struct sockaddr_in sender_addr;
@@ -34,7 +34,7 @@ void	start_loop(t_ping *p){
 	init_stats(&stats, &p->sequence_number);
 	pfd.fd = p->sockfd;
 	pfd.events = POLLIN;
-	while (g_is_running){
+	while (FLAG_SIGINT){
 		struct timespec recvt;
 		int ready;
 		double time;
@@ -68,10 +68,14 @@ void ping(char *ip_or_fqdn, t_config *conf){
 
     ping_env.sockfd = open_rawsocket();
 	init_penv(&ping_env, ip_or_fqdn, conf);
-	printf("PING %s (%s): %d data bytes\n",
+	printf("PING %s (%s): %zu data bytes",
 		ping_env.fqdn,
 		ping_env.ip,
 		ICMP_PAYLOAD_SIZE);
+  	if (conf->verbose == 1)
+    	printf (", id 0x%04x = %u\n", ping_env.pid, ping_env.pid);
+	else
+		puts("");
     start_loop(&ping_env);
 }
 

@@ -21,7 +21,7 @@
 
 #define ICMP_PAYLOAD_SIZE 56
 
-extern volatile sig_atomic_t g_is_running;
+extern volatile sig_atomic_t FLAG_SIGINT;
 
 void sigint_handler(int sig);
 
@@ -43,13 +43,13 @@ typedef struct s_ctx {
 
 typedef void (*t_icmp_handler)(t_packet *, t_ctx *);
 
-enum flags {
-	FLAG_VERBOSE = 1 << 0,
-	FLAG_HELP = 1 << 1
-};
+// enum flags {
+// 	FLAG_VERBOSE = 0b01,
+// 	FLAG_HELP = 0b10
+// };
 
 typedef struct s_config {
-	unsigned int	flags : 2;
+	int	verbose;
 } t_config;
 
 typedef struct s_ping {

@@ -158,16 +158,31 @@ void display_help(){
 
 int	parse_args(int ac, char **av, t_config *conf){
 	const struct option long_opt[] = {
-		{"verbose", no_argument, NULL, FLAG_VERBOSE},
-		{"help", no_argument, NULL, FLAG_HELP},
+		{"verbose", no_argument, 0, 'v'},
+		{"help", no_argument, 0, 'h'},
 		{0, 0, 0, 0}
 	};
 	int opt;
-	while ((opt = getopt_long(ac, av, "v?", long_opt, NULL)) != -1)
-		conf->flags += opt;
-	if (conf->flags & 0b10){
-		display_help();
-		exit(0);
+	opterr = 0;
+	while ((opt = getopt_long(ac, av, "v", long_opt, NULL)) != -1)
+	{
+		printf("optopt: %c\nopt: %c\n", optopt, opt);
+		switch (opt){
+			case 'v':
+				conf->verbose = 1;
+				break;
+			case 'h':
+				display_help();
+				exit(0);
+			case '?':
+				if (optopt == '?'){
+					display_help();
+					exit(0);
+				}
+				fprintf(stderr, "Try 'ping --help' for more information.\n");
+				exit(64);
+				break;
+		}
 	}
 	if (optind + 1 != ac){
 		fprintf(stderr, "Error: program should have only 1 argument.\n");
